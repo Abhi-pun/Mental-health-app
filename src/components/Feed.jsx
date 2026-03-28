@@ -15,7 +15,8 @@ const TAGS = [
   { id: "burnout", label: "Burned out" },
   { id: "lost", label: "Feeling lost" },
   { id: "overwhelmed", label: "Overwhelmed" },
-  { id: "miscellaneous", label: "Miscellaneous" },
+  { id: "General", label: "General" },
+  { id: "Misc", label: "Misc" },
 ];
 
 const TAG_COLORS = {
@@ -35,36 +36,38 @@ const TAG_COLORS = {
 
 // Gentle, anonymous nicknames for mental health forum
 const GENTLE_NICKNAMES = [
-  "Quiet Oak",
-  "Gentle Stream",
-  "Morning Dove",
-  "Soft Rain",
-  "Peaceful Soul",
-  "Quiet Listener",
-  "Kind Heart",
-  "Gentle Spirit",
-  "Calm Waters",
-  "Silent Strength",
-  "Soft Whisper",
-  "Brave Bloom",
-  "Tender Heart",
-  "Quiet Courage",
-  "Gentle Dawn",
-  "Peaceful Mind",
-  "Kindred Spirit",
-  "Soft Light",
-  "Quiet Warrior",
-  "Gentle Soul",
-  "Moonbeam",
-  "Wildflower",
-  "Sunrise",
-  "Willow Tree",
-  "Butterfly",
-  "Starlight",
-  "River Stone",
-  "Cloud Drifter",
-  "Ocean Wave",
-  "Meadow Song",
+  "Sanu",
+  "Babu",
+  "Nanu",
+  "Kanchha",
+  "Kanchhi",
+  "Mutu",
+  "Maya",
+  "Pyari",
+  "Kale",
+  "Kali",
+  "Phuchche",
+  "Phuchchi",
+  "Gullu",
+  "Lato",
+  "Chuchchi",
+  "Guffadi",
+  "Nidure",
+  "Bunto",
+  "Lamme",
+  "Gore",
+  "Junge",
+  "Chulbule",
+  "Laddu",
+  "Alu",
+  "Punte",
+  "Ghoke",
+  "Sete",
+  "Bhedo",
+  "Dai",
+  "Bhai",
+  "Didi",
+  "Bahini",
 ];
 
 function stableNicknameIndex(seed) {
@@ -93,19 +96,19 @@ const SEED_POSTS = [
     tag: "family",
     time: "12 min ago",
     relates: 14,
-    nickname: "Quiet Oak",
+    nickname: "Sanu",
     text: "I haven't been able to tell my parents what I'm going through. In our culture you just don't talk about these things. It's like there's no space to even feel sad without someone saying \"just be grateful\".",
     replies: [
       {
         id: 1,
         text: "The 'just be grateful' thing hits so hard. You're allowed to feel both grateful and sad at the same time.",
-        nickname: "Gentle Stream",
+        nickname: "Babu",
       },
       {
         id: 2,
         name: "Verified supporter",
         text: "What you're feeling is valid. This space exists exactly for moments like this.",
-        nickname: "Kind Heart",
+        nickname: "Nanu",
       },
     ],
   },
@@ -114,7 +117,7 @@ const SEED_POSTS = [
     tag: "burnout",
     time: "1 hr ago",
     relates: 31,
-    nickname: "Silent Strength",
+    nickname: "Kanchha",
     text: "Finished my exams but I feel nothing. Everyone around me is celebrating and I'm just... empty. I don't know if something is wrong with me.",
     replies: [],
   },
@@ -123,13 +126,13 @@ const SEED_POSTS = [
     tag: "overwhelmed",
     time: "2 hr ago",
     relates: 22,
-    nickname: "Soft Whisper",
+    nickname: "Kanchhi",
     text: "I've been telling myself 'just get through this week' for three months straight. I don't know when the week I can actually breathe is coming.",
     replies: [
       {
         id: 1,
         text: "Three months of 'just one more week' is exhausting. Your body and mind are trying to tell you something.",
-        nickname: "Gentle Spirit",
+        nickname: "Mutu",
       },
     ],
   },
@@ -138,18 +141,18 @@ const SEED_POSTS = [
     tag: "hope",
     time: "4 hr ago",
     relates: 89,
-    nickname: "Brave Bloom",
+    nickname: "Maya",
     text: "Six months ago I posted here when I was at my lowest. Today I had a real conversation with my sister about how I was feeling. Small thing. Felt huge. Thank you, SafeCircle.",
     replies: [
       {
         id: 1,
         text: "This is why this place exists. Thank you for coming back to share it. 💚",
-        nickname: "Kindred Spirit",
+        nickname: "Pyari",
       },
       {
         id: 2,
         text: "This made me tear up. So happy for you.",
-        nickname: "Soft Light",
+        nickname: "Kale",
       },
     ],
   },
@@ -158,7 +161,7 @@ const SEED_POSTS = [
     tag: "study_abroad",
     time: "5 hr ago",
     relates: 17,
-    nickname: "Willow Tree",
+    nickname: "Kali",
     text: "First in my family to study abroad. Everyone is proud. Nobody asks if I'm okay. I smile on video calls so they don't worry. I don't know how to tell them I'm not okay.",
     replies: [],
   },
@@ -167,18 +170,18 @@ const SEED_POSTS = [
     tag: "family",
     time: "25 min ago",
     relates: 41,
-    nickname: "Quiet Courage",
+    nickname: "Phuchche",
     text: "Told my family I'm stressed and they said 'others have it worse.'",
     replies: [
       {
         id: 1,
         text: "That sentence hurts more than they realize.",
-        nickname: "Gentle Dawn",
+        nickname: "Phuchchi",
       },
       {
         id: 2,
         text: "Your pain doesn't need comparison to be valid.",
-        nickname: "Peaceful Mind",
+        nickname: "Gullu",
       },
     ],
   },
@@ -187,18 +190,18 @@ const SEED_POSTS = [
     tag: "family",
     time: "3 hr ago",
     relates: 56,
-    nickname: "Tender Heart",
+    nickname: "Lato",
     text: "My parents think mental health is just an excuse. I can't talk to them about anything.",
     replies: [
       {
         id: 1,
         text: "Same here. In my house, 'just pray' is the solution to everything.",
-        nickname: "Quiet Warrior",
+        nickname: "Chuchchi",
       },
       {
         id: 2,
         text: "You're not wrong for feeling this way. It's just hard in our culture.",
-        nickname: "Gentle Soul",
+        nickname: "Guffadi",
       },
     ],
   },
@@ -207,18 +210,18 @@ const SEED_POSTS = [
     tag: "study_abroad",
     time: "18 min ago",
     relates: 38,
-    nickname: "Ocean Wave",
+    nickname: "Nidure",
     text: "I moved abroad for studies and I've never felt this alone.",
     replies: [
       {
         id: 1,
         text: "Same. Everyone thinks it's a dream life but it's actually really hard.",
-        nickname: "Moonbeam",
+        nickname: "Bunto",
       },
       {
         id: 2,
         text: "You left your whole support system behind. That's not easy.",
-        nickname: "Wildflower",
+        nickname: "Lamme",
       },
     ],
   },
@@ -227,14 +230,14 @@ const SEED_POSTS = [
     tag: "study_abroad",
     time: "1 hr ago",
     relates: 52,
-    nickname: "Starlight",
+    nickname: "Gore",
     text: "If I fail, all the money my family spent on me is wasted.",
     replies: [
-      { id: 1, text: "That guilt is so heavy.", nickname: "River Stone" },
+      { id: 1, text: "That guilt is so heavy.", nickname: "Junge" },
       {
         id: 2,
         text: "You are not an investment. You're a person.",
-        nickname: "Cloud Drifter",
+        nickname: "Chulbule",
       },
     ],
   },
@@ -243,18 +246,18 @@ const SEED_POSTS = [
     tag: "study_abroad",
     time: "6 hr ago",
     relates: 44,
-    nickname: "Butterfly",
+    nickname: "Laddu",
     text: "I feel like I'm failing at everything. Everyone else is doing better than me.",
     replies: [
       {
         id: 1,
         text: "I used to feel like that every semester. Turns out everyone is just pretending to have it together.",
-        nickname: "Meadow Song",
+        nickname: "Alu",
       },
       {
         id: 2,
         text: "You're not behind. You're just on your own timeline.",
-        nickname: "Sunrise",
+        nickname: "Punte",
       },
     ],
   },
@@ -263,18 +266,18 @@ const SEED_POSTS = [
     tag: "family",
     time: "45 min ago",
     relates: 29,
-    nickname: "Calm Waters",
+    nickname: "Ghoke",
     text: "I don't feel safe talking about my feelings in my own house.",
     replies: [
       {
         id: 1,
         text: "That's more common than people admit.",
-        nickname: "Quiet Listener",
+        nickname: "Sete",
       },
       {
         id: 2,
         text: "I'm glad you said it somewhere, even if it's here.",
-        nickname: "Peaceful Soul",
+        nickname: "Bhedo",
       },
     ],
   },
@@ -283,18 +286,18 @@ const SEED_POSTS = [
     tag: "financial",
     time: "2 hr ago",
     relates: 63,
-    nickname: "Gentle Stream",
+    nickname: "Dai",
     text: "My whole family depends on me to succeed. I feel like I can't fail.",
     replies: [
       {
         id: 1,
         text: "That kind of pressure is heavy to carry alone.",
-        nickname: "Soft Rain",
+        nickname: "Bhai",
       },
       {
         id: 2,
         text: "You're a person, not just their expectations.",
-        nickname: "Morning Dove",
+        nickname: "Didi",
       },
     ],
   },
@@ -303,18 +306,18 @@ const SEED_POSTS = [
     tag: "burnout",
     time: "33 min ago",
     relates: 71,
-    nickname: "Kind Heart",
+    nickname: "Bahini",
     text: "I'm so tired. Not physically… just tired of everything.",
     replies: [
       {
         id: 1,
         text: "That kind of tired needs rest, not sleep.",
-        nickname: "Gentle Spirit",
+        nickname: "Sanu",
       },
       {
         id: 2,
         text: "You don't have to keep pushing every day.",
-        nickname: "Quiet Oak",
+        nickname: "Babu",
       },
     ],
   },
@@ -323,18 +326,18 @@ const SEED_POSTS = [
     tag: "loneliness",
     time: "50 min ago",
     relates: 48,
-    nickname: "Gentle Spirit",
+    nickname: "Nanu",
     text: "Does anyone else get overwhelmed at night for no reason?",
     replies: [
       {
         id: 1,
         text: "Nighttime is when my brain decides to ruin everything.",
-        nickname: "Silent Strength",
+        nickname: "Kanchha",
       },
       {
         id: 2,
         text: "You're not the only one awake feeling this.",
-        nickname: "Soft Whisper",
+        nickname: "Kanchhi",
       },
     ],
   },
@@ -343,18 +346,18 @@ const SEED_POSTS = [
     tag: "family",
     time: "1 hr ago",
     relates: 54,
-    nickname: "Peaceful Soul",
+    nickname: "Mutu",
     text: "My relatives keep comparing me to others and I feel like I'm never enough.",
     replies: [
       {
         id: 1,
         text: "Relatives can be brutal without realizing it.",
-        nickname: "Brave Bloom",
+        nickname: "Maya",
       },
       {
         id: 2,
         text: "You're not here to compete with anyone.",
-        nickname: "Tender Heart",
+        nickname: "Pyari",
       },
     ],
   },
@@ -414,12 +417,12 @@ const getInitialsFromNickname = (nickname) => {
     if (alnum.length >= 2) return alnum.slice(0, 2).toUpperCase();
     return (u.slice(0, 2) || "ME").toUpperCase();
   }
-  return nickname
-    .split(" ")
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const parts = nickname.split(" ").filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  const compact = parts[0] || nickname;
+  return compact.slice(0, 2).toUpperCase();
 };
 
 function PostCard({ post, onRelate, onReply, writesEnabled }) {

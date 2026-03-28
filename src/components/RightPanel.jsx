@@ -1,9 +1,9 @@
 import { Heart } from 'lucide-react';
 
 const SUPPORTERS = [
-  { initial: 'S', color: '#5C8C60' },
-  { initial: 'R', color: '#9B8EC4' },
-  { initial: 'M', color: '#E8A87C' },
+  { name: 'Maya', initial: 'M', color: '#5C8C60' },
+  { name: 'Tara', initial: 'T', color: '#9B8EC4' },
+  { name: 'Phool', initial: 'P', color: '#E8A87C' },
 ];
 
 export default function RightPanel({ onOpenCompanion, reachCount }) {
@@ -101,7 +101,7 @@ export default function RightPanel({ onOpenCompanion, reachCount }) {
                 {s.initial}
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink)' }}>Anonymous</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink)' }}>{s.name}</p>
                 <p style={{ fontSize: 11, color: 'var(--ink-soft)' }}>Verified supporter</p>
               </div>
               <div style={{
