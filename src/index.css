@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sage:        #5C8C60;
+  --sage-light:  #8AB88E;
+  --sage-pale:   #EBF2EC;
+  --sage-mid:    #D4E8D6;
+  --warm:        #F7F3EE;
+  --warm-mid:    #E8DDD0;
+  --warm-dark:   #D4C4B0;
+  --clay:        #C4856A;
+  --clay-light:  #EAC4B3;
+  --lavender:    #9B8EC4;
+  --lav-pale:    #EEEAF8;
+  --peach:       #E8A87C;
+  --peach-pale:  #FDF0E8;
+  --ink:         #1E2420;
+  --ink-mid:     #4A5450;
+  --ink-soft:    #8A9490;
+  --white:       #FFFFFF;
+  --sidebar-w:   220px;
+  --right-w:     280px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --radius-xl:   24px;
+  --shadow-soft: 0 1px 12px rgba(30,36,32,0.07);
+  --shadow-card: 0 2px 20px rgba(30,36,32,0.09);
+  --transition:  0.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--warm);
+  color: var(--ink);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3,h4 { font-family: 'DM Serif Display', serif; line-height: 1.25; }
+button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+input, textarea { font-family: inherit; outline: none; border: none; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--warm-mid); border-radius: 10px; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes pulse-reach {
+  0%,100% { box-shadow: 0 0 0 0 rgba(92,140,96,0.3); }
+  50%      { box-shadow: 0 0 0 14px rgba(92,140,96,0); }
+}
+@keyframes ripple {
+  0%   { transform: scale(0); opacity: 0.5; }
+  100% { transform: scale(3); opacity: 0; }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+@keyframes breathe {
+  0%,100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.15); }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
