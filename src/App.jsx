@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import './index.css';
+import { useAuth } from './context/AuthContext';
+import LoginPage from './components/LoginPage';
 import Sidebar from './components/Sidebar';
 import Feed from './components/Feed';
 import WellbeingMetric from './components/WellbeingMetric';
@@ -7,9 +9,15 @@ import Companion from './components/Companion';
 import RightPanel from './components/RightPanel';
 
 export default function App() {
+  const { isConfigured, sessionReady, userId } = useAuth();
   const [activePage, setActivePage] = useState('feed');
   const [reachCount, setReachCount] = useState(3);
-  const [companionOpen, setCompanionOpen] = useState(false);
+
+  const needsLogin = isConfigured && (!sessionReady || !userId);
+
+  if (needsLogin) {
+    return <LoginPage />;
+  }
 
   return (
     <div style={{
@@ -34,9 +42,7 @@ export default function App() {
         borderRight: '1px solid var(--warm-mid)',
         background: 'var(--white)',
       }}>
-        {activePage === 'feed' && (
-          <Feed reachCount={reachCount} setReachCount={setReachCount} />
-        )}
+        {activePage === 'feed' && <Feed />}
         {activePage === 'wellbeing' && (
           <div style={{ padding: '28px 28px 80px' }}>
             <div style={{ marginBottom: 24 }}>

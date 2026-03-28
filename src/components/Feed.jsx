@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { Flag, Heart, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Flag, Heart, MessageCircle } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { mapRowToPost } from '../lib/feedPosts';
+import { useAuth } from '../context/AuthContext';
 
 const TAGS = [
   { id: 'all',      label: 'All' },
@@ -27,6 +30,7 @@ const TAG_COLORS = {
   financial:   { bg: '#F5F0E8', text: '#8B7355', border: '#D8C8A8' },
   academic:    { bg: '#ECEAF8', text: '#6B5BA8', border: '#C4BEE8' },
   loneliness:  { bg: '#EDE8F2', text: '#7A6B8C', border: '#C8BED8' },
+  miscellaneous: { bg: '#F0F0F0', text: '#6B6B6B', border: '#D8D8D8' },
 };
 
 const SEED_POSTS = [
@@ -162,18 +166,23 @@ function TagPill({ tag, small }) {
   );
 }
 
-function PostCard({ post }) {
-  const [relates, setRelates] = useState(post.relates);
+function PostCard({ post, onRelate, onReply, writesEnabled }) {
   const [related, setRelated] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [replyText, setReplyText] = useState('');
-  const [localReplies, setLocalReplies] = useState(post.replies);
   const [reported, setReported] = useState(false);
 
-  const handleReply = () => {
-    if (!replyText.trim()) return;
-    setLocalReplies(r => [...r, { id: Date.now(), text: replyText }]);
+  const handleRelateClick = () => {
+    if (related || !writesEnabled) return;
+    setRelated(true);
+    onRelate(post.id);
+  };
+
+  const handleReplySend = async () => {
+    if (!replyText.trim() || !writesEnabled) return;
+    const t = replyText.trim();
     setReplyText('');
+    await onReply(post.id, t);
   };
 
   return (
@@ -218,19 +227,21 @@ function PostCard({ post }) {
 
       {/* Actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-        <button onClick={() => { if (!related) { setRelated(true); setRelates(r => r + 1); } }} style={{
+        <button onClick={handleRelateClick} disabled={!writesEnabled} style={{
           display: 'flex', alignItems: 'center', gap: 5,
           background: 'none', fontSize: 12,
           color: related ? 'var(--sage)' : 'var(--ink-soft)',
           fontWeight: related ? 500 : 400,
           transition: 'color 0.2s',
+          opacity: writesEnabled ? 1 : 0.45,
+          cursor: writesEnabled ? 'pointer' : 'not-allowed',
         }}>
           <div style={{
             width: 7, height: 7, borderRadius: '50%',
             background: related ? 'var(--sage)' : 'var(--warm-dark)',
             transition: 'background 0.2s',
           }} />
-          {relates} {relates === 1 ? 'person relates' : 'people relate'}
+          {post.relates} {post.relates === 1 ? 'person relates' : 'people relate'}
         </button>
         <button onClick={() => setShowReplies(v => !v)} style={{
           display: 'flex', alignItems: 'center', gap: 5,
@@ -251,7 +262,7 @@ function PostCard({ post }) {
       {/* Replies */}
       {showReplies && (
         <div style={{ marginTop: 16 }}>
-          {localReplies.map(r => (
+          {post.replies.map(r => (
             <div key={r.id} style={{
               padding: '10px 14px', marginBottom: 8,
               background: 'var(--warm)', borderRadius: 'var(--radius-md)',
@@ -271,7 +282,7 @@ function PostCard({ post }) {
             <input
               value={replyText}
               onChange={e => setReplyText(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleReply()}
+              onKeyDown={e => e.key === 'Enter' && handleReplySend()}
               placeholder="Reply anonymously…"
               style={{
                 flex: 1, padding: '9px 14px',
@@ -280,12 +291,18 @@ function PostCard({ post }) {
                 borderRadius: 50, fontSize: 13, color: 'var(--ink)',
               }}
             />
-            <button onClick={handleReply} style={{
-              padding: '9px 18px', borderRadius: 50,
-              background: replyText.trim() ? 'var(--sage)' : 'var(--warm-mid)',
-              color: 'white', fontSize: 13, fontWeight: 500,
-              transition: 'background 0.2s',
-            }}>
+            <button
+              onClick={handleReplySend}
+              disabled={!writesEnabled}
+              style={{
+                padding: '9px 18px', borderRadius: 50,
+                background: replyText.trim() && writesEnabled ? 'var(--sage)' : 'var(--warm-mid)',
+                color: 'white', fontSize: 13, fontWeight: 500,
+                transition: 'background 0.2s',
+                opacity: writesEnabled ? 1 : 0.6,
+                cursor: writesEnabled ? 'pointer' : 'not-allowed',
+              }}
+            >
               Send
             </button>
           </div>
@@ -295,21 +312,123 @@ function PostCard({ post }) {
   );
 }
 
-export default function Feed({ reachCount, setReachCount }) {
+export default function Feed() {
+  const { userId, isAnonymousUser, isConfigured: authConfigured } = useAuth();
   const [activeTag, setActiveTag] = useState('all');
-  const [posts, setPosts] = useState(SEED_POSTS);
+  const [posts, setPosts] = useState(() => (isSupabaseConfigured ? [] : SEED_POSTS));
+  const [loadingPosts, setLoadingPosts] = useState(isSupabaseConfigured);
+  const [dbError, setDbError] = useState(null);
+  const [persistToSupabase, setPersistToSupabase] = useState(false);
   const [composing, setComposing] = useState(false);
   const [newText, setNewText] = useState('');
   const [newTag, setNewTag] = useState('overwhelmed');
-  const [reachBanner, setReachBanner] = useState(true);
+  const [reachBanner] = useState(true);
+
+  const canWriteDb = persistToSupabase && Boolean(userId);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) {
+      setLoadingPosts(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('id, created_at, tag, body, relates_count, replies ( id, body, display_name, created_at )')
+          .order('created_at', { ascending: false });
+        if (cancelled) return;
+        if (error) throw error;
+        setPosts((data || []).map(mapRowToPost));
+        setPersistToSupabase(true);
+        setDbError(null);
+      } catch (e) {
+        if (!cancelled) {
+          setDbError(e.message || 'Could not load posts from Supabase.');
+          setPosts(SEED_POSTS);
+          setPersistToSupabase(false);
+        }
+      } finally {
+        if (!cancelled) setLoadingPosts(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleRelate = useCallback((postId) => {
+    if (persistToSupabase && supabase && userId) {
+      supabase.rpc('increment_post_relates', { target_id: postId }).then(({ error }) => {
+        if (error) console.error(error);
+      });
+    }
+    setPosts((ps) =>
+      ps.map((p) => (p.id === postId ? { ...p, relates: p.relates + 1 } : p)),
+    );
+  }, [persistToSupabase, userId]);
+
+  const handleReply = useCallback(async (postId, text) => {
+    if (persistToSupabase && supabase) {
+      if (!userId) return;
+      const { data, error } = await supabase
+        .from('replies')
+        .insert({ post_id: postId, body: text, user_id: userId })
+        .select('id, body, display_name')
+        .single();
+      if (error) {
+        console.error(error);
+        return;
+      }
+      setPosts((ps) =>
+        ps.map((p) =>
+          p.id === postId
+            ? {
+                ...p,
+                replies: [
+                  ...p.replies,
+                  { id: data.id, text: data.body, name: data.display_name || undefined },
+                ],
+              }
+            : p,
+        ),
+      );
+      return;
+    }
+    setPosts((ps) =>
+      ps.map((p) =>
+        p.id === postId
+          ? { ...p, replies: [...p.replies, { id: Date.now(), text }] }
+          : p,
+      ),
+    );
+  }, [persistToSupabase, userId]);
+
+  const handlePost = async () => {
+    if (!newText.trim()) return;
+    const body = newText.trim();
+    if (persistToSupabase && supabase) {
+      if (!userId) return;
+      const { data, error } = await supabase
+        .from('posts')
+        .insert({ tag: newTag, body, user_id: userId })
+        .select('id, created_at, tag, body, relates_count')
+        .single();
+      if (error) {
+        console.error(error);
+        return;
+      }
+      setPosts((p) => [mapRowToPost({ ...data, replies: [] }), ...p]);
+    } else {
+      setPosts((p) => [
+        { id: Date.now(), tag: newTag, time: 'just now', relates: 0, text: body, replies: [] },
+        ...p,
+      ]);
+    }
+    setNewText('');
+    setComposing(false);
+  };
 
   const filtered = activeTag === 'all' ? posts : posts.filter(p => p.tag === activeTag);
-
-  const handlePost = () => {
-    if (!newText.trim()) return;
-    setPosts(p => [{ id: Date.now(), tag: newTag, time: 'just now', relates: 0, text: newText, replies: [] }, ...p]);
-    setNewText(''); setComposing(false);
-  };
 
   return (
     <div>
@@ -325,7 +444,17 @@ export default function Feed({ reachCount, setReachCount }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
           <div>
             <h2 style={{ fontSize: 22, color: 'var(--ink)', marginBottom: 2 }}>Community feed</h2>
-            <p style={{ fontSize: 12, color: 'var(--ink-soft)' }}>anonymous • safe • real</p>
+            <p style={{ fontSize: 12, color: 'var(--ink-soft)' }}>
+              anonymous • safe • real
+              {persistToSupabase && (
+                <span style={{ marginLeft: 8, color: 'var(--sage)' }}>· saved</span>
+              )}
+              {persistToSupabase && authConfigured && userId && (
+                <span style={{ marginLeft: 8, color: 'var(--ink-mid)' }}>
+                  · {!isAnonymousUser ? 'account' : 'private session'}
+                </span>
+              )}
+            </p>
           </div>
           <button
             onClick={() => setComposing(v => !v)}
@@ -409,11 +538,17 @@ export default function Feed({ reachCount, setReachCount }) {
               }}>
                 Cancel
               </button>
-              <button onClick={handlePost} style={{
-                padding: '8px 20px', borderRadius: 50,
-                background: newText.trim() ? 'var(--sage)' : 'var(--warm-mid)',
-                color: 'white', fontSize: 12, fontWeight: 500, transition: 'background 0.2s',
-              }}>
+              <button
+                onClick={handlePost}
+                disabled={persistToSupabase && !canWriteDb}
+                style={{
+                  padding: '8px 20px', borderRadius: 50,
+                  background: newText.trim() && (!persistToSupabase || canWriteDb) ? 'var(--sage)' : 'var(--warm-mid)',
+                  color: 'white', fontSize: 12, fontWeight: 500, transition: 'background 0.2s',
+                  opacity: persistToSupabase && !canWriteDb ? 0.7 : 1,
+                  cursor: persistToSupabase && !canWriteDb ? 'not-allowed' : 'pointer',
+                }}
+              >
                 Share
               </button>
             </div>
@@ -421,8 +556,28 @@ export default function Feed({ reachCount, setReachCount }) {
         </div>
       )}
 
+      {dbError && (
+        <div style={{
+          margin: '12px 24px 0',
+          padding: '10px 14px',
+          background: '#FDF6F0',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid #E8C4B3',
+          fontSize: 13,
+          color: 'var(--ink-mid)',
+        }}>
+          {dbError} Showing sample posts offline.
+        </div>
+      )}
+
+      {loadingPosts && (
+        <div style={{ padding: '32px 24px', textAlign: 'center', color: 'var(--ink-soft)', fontSize: 14 }}>
+          Loading posts…
+        </div>
+      )}
+
       {/* Reach banner */}
-      {reachBanner && (
+      {!loadingPosts && reachBanner && (
         <div style={{
           margin: '16px 24px',
           padding: '14px 16px',
@@ -452,10 +607,16 @@ export default function Feed({ reachCount, setReachCount }) {
 
       {/* Posts */}
       <div>
-        {filtered.map(post => (
-          <PostCard key={post.id} post={post} />
+        {!loadingPosts && filtered.map(post => (
+          <PostCard
+            key={post.id}
+            post={post}
+            onRelate={handleRelate}
+            onReply={handleReply}
+            writesEnabled={!persistToSupabase || canWriteDb}
+          />
         ))}
-        {filtered.length === 0 && (
+        {!loadingPosts && filtered.length === 0 && (
           <div style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--ink-soft)' }}>
             <p style={{ fontSize: 15, marginBottom: 6 }}>No posts with this feeling yet.</p>
             <p style={{ fontSize: 13 }}>Be the first to share.</p>

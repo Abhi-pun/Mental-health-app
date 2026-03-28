@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
-function ReachButton({ reachCount, setReachCount }) {
+function ReachButton({ setReachCount }) {
   const [active, setActive] = useState(false);
   const [rippling, setRippling] = useState(false);
   const [notice, setNotice] = useState(null);
@@ -104,6 +105,18 @@ function ReachButton({ reachCount, setReachCount }) {
 }
 
 export default function Sidebar({ activePage, setActivePage, reachCount, setReachCount }) {
+  const {
+    isConfigured: authConfigured,
+    loading: authLoading,
+    error: authError,
+    userId,
+    userIdSuffix,
+    signOut,
+    clearError,
+    loginUserId,
+    isAnonymousUser,
+  } = useAuth();
+
   const navItems = [
     { id: 'feed',      label: 'Feed',       dot: '#5C8C60' },
     { id: 'myposts',   label: 'My posts',   dot: '#9B8EC4' },
@@ -172,6 +185,98 @@ export default function Sidebar({ activePage, setActivePage, reachCount, setReac
           </button>
         ))}
       </nav>
+
+      {authConfigured && (
+        <div style={{
+          margin: '0 12px 12px',
+          padding: '12px 14px',
+          borderRadius: 'var(--radius-md)',
+          background: 'var(--warm)',
+          border: '1px solid var(--warm-mid)',
+        }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>
+            Your account
+          </p>
+          {authLoading && (
+            <p style={{ fontSize: 11, color: 'var(--ink-soft)', lineHeight: 1.45 }}>
+              Loading…
+            </p>
+          )}
+          {!authLoading && authError && (
+            <>
+              <p style={{ fontSize: 11, color: 'var(--clay)', lineHeight: 1.45, marginBottom: 8 }}>
+                {authError}
+              </p>
+              <button
+                type="button"
+                onClick={() => clearError()}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: 50,
+                  background: 'var(--sage)',
+                  color: 'white',
+                  fontSize: 11,
+                  fontWeight: 500,
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                Dismiss
+              </button>
+            </>
+          )}
+          {!authLoading && userId && (
+            <>
+              <p style={{ fontSize: 11, color: 'var(--ink-soft)', lineHeight: 1.5 }}>
+                {loginUserId ? (
+                  <>
+                    Signed in as <strong style={{ color: 'var(--ink-mid)' }}>{loginUserId}</strong>
+                    <span style={{ display: 'block', marginTop: 6 }}>
+                      You can log out and sign back in anytime; your posts stay tied to this account.
+                    </span>
+                  </>
+                ) : !isAnonymousUser ? (
+                  <>
+                    Signed in with your account.
+                    {userIdSuffix && (
+                      <span style={{ display: 'block', marginTop: 6, fontFamily: 'monospace', color: 'var(--ink-mid)' }}>
+                        Ref ·•••{userIdSuffix}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    Anonymous session.
+                    {userIdSuffix && (
+                      <span style={{ display: 'block', marginTop: 6, fontFamily: 'monospace', color: 'var(--ink-mid)' }}>
+                        Session ·•••{userIdSuffix}
+                      </span>
+                    )}
+                  </>
+                )}
+              </p>
+              <button
+                type="button"
+                onClick={() => signOut()}
+                style={{
+                  marginTop: 10,
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 50,
+                  background: 'white',
+                  border: '1px solid var(--warm-mid)',
+                  color: 'var(--ink-mid)',
+                  fontSize: 11,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                }}
+              >
+                Log out
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Reach Button */}
       <div style={{ paddingBottom: 20 }}>
