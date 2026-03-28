@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Flag, Heart, MessageCircle } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../lib/supabaseClient";
 import { mapRowToPost } from "../lib/feedPosts";
@@ -65,56 +65,280 @@ const GENTLE_NICKNAMES = [
   "Cloud Drifter",
   "Ocean Wave",
   "Meadow Song",
-  "Caring Heart",
-  "Warm Embrace",
-  "Quiet Hope",
-  "Gentle Voice",
-  "Peaceful Journey",
 ];
 
-// Map to store nicknames per user/post for consistency
-const nicknameMap = new Map();
-
-// Function to get or generate a consistent nickname for a post
-const getNicknameForPost = (postId) => {
-  if (nicknameMap.has(postId)) {
-    return nicknameMap.get(postId);
-  }
-  const randomNickname =
-    GENTLE_NICKNAMES[Math.floor(Math.random() * GENTLE_NICKNAMES.length)];
-  nicknameMap.set(postId, randomNickname);
-  return randomNickname;
-};
-
-// Get initials from nickname (first letters of each word)
-const getInitialsFromNickname = (nickname) => {
-  return nickname
-    .split(" ")
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-};
-
-// Get color based on nickname (consistent but gentle colors)
-const getColorForNickname = (nickname) => {
-  const colors = [
-    "#9B8EC4",
-    "#C4856A",
-    "#5C8C60",
-    "#E8A87C",
-    "#5B8FA8",
-    "#A87CA8",
-    "#A86B78",
-    "#5B6FA8",
-    "#8B7355",
-    "#6B5BA8",
-  ];
-  const index =
-    nickname.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
-    colors.length;
-  return colors[index];
-};
+const SEED_POSTS = [
+  {
+    id: 1,
+    tag: "family",
+    time: "12 min ago",
+    relates: 14,
+    nickname: "Quiet Oak",
+    text: "I haven't been able to tell my parents what I'm going through. In our culture you just don't talk about these things. It's like there's no space to even feel sad without someone saying \"just be grateful\".",
+    replies: [
+      {
+        id: 1,
+        text: "The 'just be grateful' thing hits so hard. You're allowed to feel both grateful and sad at the same time.",
+        nickname: "Gentle Stream",
+      },
+      {
+        id: 2,
+        name: "Verified supporter",
+        text: "What you're feeling is valid. This space exists exactly for moments like this.",
+        nickname: "Kind Heart",
+      },
+    ],
+  },
+  {
+    id: 2,
+    tag: "burnout",
+    time: "1 hr ago",
+    relates: 31,
+    nickname: "Silent Strength",
+    text: "Finished my exams but I feel nothing. Everyone around me is celebrating and I'm just... empty. I don't know if something is wrong with me.",
+    replies: [],
+  },
+  {
+    id: 3,
+    tag: "overwhelmed",
+    time: "2 hr ago",
+    relates: 22,
+    nickname: "Soft Whisper",
+    text: "I've been telling myself 'just get through this week' for three months straight. I don't know when the week I can actually breathe is coming.",
+    replies: [
+      {
+        id: 1,
+        text: "Three months of 'just one more week' is exhausting. Your body and mind are trying to tell you something.",
+        nickname: "Gentle Spirit",
+      },
+    ],
+  },
+  {
+    id: 4,
+    tag: "hope",
+    time: "4 hr ago",
+    relates: 89,
+    nickname: "Brave Bloom",
+    text: "Six months ago I posted here when I was at my lowest. Today I had a real conversation with my sister about how I was feeling. Small thing. Felt huge. Thank you, SafeCircle.",
+    replies: [
+      {
+        id: 1,
+        text: "This is why this place exists. Thank you for coming back to share it. 💚",
+        nickname: "Kindred Spirit",
+      },
+      {
+        id: 2,
+        text: "This made me tear up. So happy for you.",
+        nickname: "Soft Light",
+      },
+    ],
+  },
+  {
+    id: 5,
+    tag: "study_abroad",
+    time: "5 hr ago",
+    relates: 17,
+    nickname: "Willow Tree",
+    text: "First in my family to study abroad. Everyone is proud. Nobody asks if I'm okay. I smile on video calls so they don't worry. I don't know how to tell them I'm not okay.",
+    replies: [],
+  },
+  {
+    id: 6,
+    tag: "family",
+    time: "25 min ago",
+    relates: 41,
+    nickname: "Quiet Courage",
+    text: "Told my family I'm stressed and they said 'others have it worse.'",
+    replies: [
+      {
+        id: 1,
+        text: "That sentence hurts more than they realize.",
+        nickname: "Gentle Dawn",
+      },
+      {
+        id: 2,
+        text: "Your pain doesn't need comparison to be valid.",
+        nickname: "Peaceful Mind",
+      },
+    ],
+  },
+  {
+    id: 7,
+    tag: "family",
+    time: "3 hr ago",
+    relates: 56,
+    nickname: "Tender Heart",
+    text: "My parents think mental health is just an excuse. I can't talk to them about anything.",
+    replies: [
+      {
+        id: 1,
+        text: "Same here. In my house, 'just pray' is the solution to everything.",
+        nickname: "Quiet Warrior",
+      },
+      {
+        id: 2,
+        text: "You're not wrong for feeling this way. It's just hard in our culture.",
+        nickname: "Gentle Soul",
+      },
+    ],
+  },
+  {
+    id: 8,
+    tag: "study_abroad",
+    time: "18 min ago",
+    relates: 38,
+    nickname: "Ocean Wave",
+    text: "I moved abroad for studies and I've never felt this alone.",
+    replies: [
+      {
+        id: 1,
+        text: "Same. Everyone thinks it's a dream life but it's actually really hard.",
+        nickname: "Moonbeam",
+      },
+      {
+        id: 2,
+        text: "You left your whole support system behind. That's not easy.",
+        nickname: "Wildflower",
+      },
+    ],
+  },
+  {
+    id: 9,
+    tag: "study_abroad",
+    time: "1 hr ago",
+    relates: 52,
+    nickname: "Starlight",
+    text: "If I fail, all the money my family spent on me is wasted.",
+    replies: [
+      { id: 1, text: "That guilt is so heavy.", nickname: "River Stone" },
+      {
+        id: 2,
+        text: "You are not an investment. You're a person.",
+        nickname: "Cloud Drifter",
+      },
+    ],
+  },
+  {
+    id: 10,
+    tag: "study_abroad",
+    time: "6 hr ago",
+    relates: 44,
+    nickname: "Butterfly",
+    text: "I feel like I'm failing at everything. Everyone else is doing better than me.",
+    replies: [
+      {
+        id: 1,
+        text: "I used to feel like that every semester. Turns out everyone is just pretending to have it together.",
+        nickname: "Meadow Song",
+      },
+      {
+        id: 2,
+        text: "You're not behind. You're just on your own timeline.",
+        nickname: "Sunrise",
+      },
+    ],
+  },
+  {
+    id: 11,
+    tag: "family",
+    time: "45 min ago",
+    relates: 29,
+    nickname: "Calm Waters",
+    text: "I don't feel safe talking about my feelings in my own house.",
+    replies: [
+      {
+        id: 1,
+        text: "That's more common than people admit.",
+        nickname: "Quiet Listener",
+      },
+      {
+        id: 2,
+        text: "I'm glad you said it somewhere, even if it's here.",
+        nickname: "Peaceful Soul",
+      },
+    ],
+  },
+  {
+    id: 12,
+    tag: "financial",
+    time: "2 hr ago",
+    relates: 63,
+    nickname: "Gentle Stream",
+    text: "My whole family depends on me to succeed. I feel like I can't fail.",
+    replies: [
+      {
+        id: 1,
+        text: "That kind of pressure is heavy to carry alone.",
+        nickname: "Soft Rain",
+      },
+      {
+        id: 2,
+        text: "You're a person, not just their expectations.",
+        nickname: "Morning Dove",
+      },
+    ],
+  },
+  {
+    id: 13,
+    tag: "burnout",
+    time: "33 min ago",
+    relates: 71,
+    nickname: "Kind Heart",
+    text: "I'm so tired. Not physically… just tired of everything.",
+    replies: [
+      {
+        id: 1,
+        text: "That kind of tired needs rest, not sleep.",
+        nickname: "Gentle Spirit",
+      },
+      {
+        id: 2,
+        text: "You don't have to keep pushing every day.",
+        nickname: "Quiet Oak",
+      },
+    ],
+  },
+  {
+    id: 14,
+    tag: "loneliness",
+    time: "50 min ago",
+    relates: 48,
+    nickname: "Gentle Spirit",
+    text: "Does anyone else get overwhelmed at night for no reason?",
+    replies: [
+      {
+        id: 1,
+        text: "Nighttime is when my brain decides to ruin everything.",
+        nickname: "Silent Strength",
+      },
+      {
+        id: 2,
+        text: "You're not the only one awake feeling this.",
+        nickname: "Soft Whisper",
+      },
+    ],
+  },
+  {
+    id: 15,
+    tag: "family",
+    time: "1 hr ago",
+    relates: 54,
+    nickname: "Peaceful Soul",
+    text: "My relatives keep comparing me to others and I feel like I'm never enough.",
+    replies: [
+      {
+        id: 1,
+        text: "Relatives can be brutal without realizing it.",
+        nickname: "Brave Bloom",
+      },
+      {
+        id: 2,
+        text: "You're not here to compete with anyone.",
+        nickname: "Tender Heart",
+      },
+    ],
+  },
+];
 
 function TagPill({ tag, small }) {
   const c = TAG_COLORS[tag] || {
@@ -141,16 +365,45 @@ function TagPill({ tag, small }) {
   );
 }
 
+// Get color based on nickname (consistent but gentle colors)
+const getColorForNickname = (nickname) => {
+  const colors = [
+    "#9B8EC4",
+    "#C4856A",
+    "#5C8C60",
+    "#E8A87C",
+    "#5B8FA8",
+    "#A87CA8",
+    "#A86B78",
+    "#5B6FA8",
+    "#8B7355",
+    "#6B5BA8",
+  ];
+  const index =
+    nickname.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
+    colors.length;
+  return colors[index];
+};
+
+// Get initials from nickname
+const getInitialsFromNickname = (nickname) => {
+  return nickname
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};
+
 function PostCard({ post, onRelate, onReply, writesEnabled }) {
   const [related, setRelated] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [reported, setReported] = useState(false);
 
-  // Get consistent nickname for this post
-  const nickname = useMemo(() => getNicknameForPost(post.id), [post.id]);
-  const initials = useMemo(() => getInitialsFromNickname(nickname), [nickname]);
-  const avatarColor = useMemo(() => getColorForNickname(nickname), [nickname]);
+  const nickname = post.nickname || "Anonymous";
+  const initials = getInitialsFromNickname(nickname);
+  const avatarColor = getColorForNickname(nickname);
 
   const handleRelateClick = () => {
     if (related || !writesEnabled) return;
@@ -306,8 +559,11 @@ function PostCard({ post, onRelate, onReply, writesEnabled }) {
       {showReplies && (
         <div style={{ marginTop: 16 }}>
           {post.replies.map((r) => {
-            // Generate consistent nickname for each reply based on its ID
-            const replyNickname = r.name || getNicknameForPost(`reply_${r.id}`);
+            const replyNickname =
+              r.nickname ||
+              (r.name === "Verified supporter"
+                ? "✨ Verified Supporter"
+                : "Gentle Soul");
             const replyInitials = getInitialsFromNickname(replyNickname);
             const replyColor = getColorForNickname(replyNickname);
 
@@ -441,7 +697,17 @@ export default function Feed() {
           .order("created_at", { ascending: false });
         if (cancelled) return;
         if (error) throw error;
-        setPosts((data || []).map(mapRowToPost));
+        const mappedPosts = (data || []).map((post) => {
+          const randomNickname =
+            GENTLE_NICKNAMES[
+              Math.floor(Math.random() * GENTLE_NICKNAMES.length)
+            ];
+          return {
+            ...mapRowToPost(post),
+            nickname: randomNickname,
+          };
+        });
+        setPosts(mappedPosts);
         setPersistToSupabase(true);
         setDbError(null);
       } catch (e) {
@@ -477,6 +743,9 @@ export default function Feed() {
 
   const handleReply = useCallback(
     async (postId, text) => {
+      const randomNickname =
+        GENTLE_NICKNAMES[Math.floor(Math.random() * GENTLE_NICKNAMES.length)];
+
       if (persistToSupabase && supabase) {
         if (!userId) return;
         const { data, error } = await supabase
@@ -498,9 +767,8 @@ export default function Feed() {
                     {
                       id: data.id,
                       text: data.body,
-                      name:
-                        data.display_name ||
-                        getNicknameForPost(`reply_${data.id}`),
+                      nickname: randomNickname,
+                      name: data.display_name,
                     },
                   ],
                 }
@@ -509,9 +777,6 @@ export default function Feed() {
         );
         return;
       }
-      // For seed posts, generate a random nickname for the reply
-      const randomNickname =
-        GENTLE_NICKNAMES[Math.floor(Math.random() * GENTLE_NICKNAMES.length)];
       setPosts((ps) =>
         ps.map((p) =>
           p.id === postId
@@ -522,7 +787,7 @@ export default function Feed() {
                   {
                     id: Date.now(),
                     text,
-                    name: randomNickname,
+                    nickname: randomNickname,
                   },
                 ],
               }
@@ -536,6 +801,9 @@ export default function Feed() {
   const handlePost = async () => {
     if (!newText.trim()) return;
     const body = newText.trim();
+    const randomNickname =
+      GENTLE_NICKNAMES[Math.floor(Math.random() * GENTLE_NICKNAMES.length)];
+
     if (persistToSupabase && supabase) {
       if (!userId) return;
       const { data, error } = await supabase
@@ -547,14 +815,14 @@ export default function Feed() {
         console.error(error);
         return;
       }
-      setPosts((p) => [mapRowToPost({ ...data, replies: [] }), ...p]);
+      setPosts((p) => [
+        {
+          ...mapRowToPost({ ...data, replies: [] }),
+          nickname: randomNickname,
+        },
+        ...p,
+      ]);
     } else {
-      // Generate a random nickname for the new post
-      const randomNickname =
-        GENTLE_NICKNAMES[Math.floor(Math.random() * GENTLE_NICKNAMES.length)];
-      // Store the nickname in the map
-      nicknameMap.set(Date.now(), randomNickname);
-
       setPosts((p) => [
         {
           id: Date.now(),
