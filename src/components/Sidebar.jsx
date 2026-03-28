@@ -9,7 +9,7 @@ function ReachButton({ setReachCount }) {
 
   const MESSAGES = [
     "Someone nearby just reached out.",
-    "A new Reach signal received.",
+    "A new reach signal received.",
     "Someone is struggling quietly.",
   ];
 
@@ -19,7 +19,7 @@ function ReachButton({ setReachCount }) {
         setNotice(MESSAGES[Math.floor(Math.random() * MESSAGES.length)]);
         setNoticeVisible(true);
         setReachCount((c) => c + 1);
-        setTimeout(() => setNoticeVisible(false), 4000);
+        setTimeout(() => setNoticeVisible(false), 4500);
       }
     }, 15000);
     return () => clearInterval(interval);
@@ -38,79 +38,111 @@ function ReachButton({ setReachCount }) {
 
   return (
     <div
+      onClick={handleReach}
       style={{
         margin: "8px 12px 0",
-        borderRadius: "var(--radius-lg)",
-        border: active
-          ? "1.5px solid var(--sage-light)"
-          : "1.5px solid var(--warm-mid)",
-        background: active ? "var(--sage-pale)" : "var(--warm)",
-        padding: "14px 16px",
-        transition: "all 0.3s ease",
+        borderRadius: 18,
+        border: active ? "1.5px solid #5c8c60" : "1.5px solid #c8dbc9",
+        background: active ? "#e8f3e8" : "#f2f8f2",
+        padding: "16px 18px",
         cursor: "pointer",
+        transition: "all 0.35s ease",
+        boxShadow: active ? "0 0 0 5px rgba(92,140,96,0.11)" : "none",
       }}
-      onClick={handleReach}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        {/* Button circle */}
-        <div style={{ position: "relative", flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        {/* Orb with breathing rings */}
+        <div
+          style={{
+            position: "relative",
+            width: 46,
+            height: 46,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* Ring 1 */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: "50%",
+              border: "1.5px solid rgba(92,140,96,0.4)",
+              animation: active ? "breathe 2.8s ease-in-out infinite" : "none",
+            }}
+          />
+          {/* Ring 2 */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: "50%",
+              border: "1.5px solid rgba(92,140,96,0.2)",
+              animation: active
+                ? "breathe2 2.8s ease-in-out infinite 0.5s"
+                : "none",
+            }}
+          />
+          {/* Ripple on click */}
           {rippling && (
             <div
               style={{
                 position: "absolute",
                 inset: 0,
                 borderRadius: "50%",
-                background: "var(--sage)",
-                animation: "ripple 0.7s ease-out forwards",
+                background: "rgba(92,140,96,0.22)",
+                animation: "ripple 0.65s ease-out forwards",
               }}
             />
           )}
+          {/* Orb */}
           <div
             style={{
-              width: 38,
-              height: 38,
+              width: 42,
+              height: 42,
               borderRadius: "50%",
-              background: active ? "var(--sage)" : "white",
-              border: `2px solid ${active ? "transparent" : "var(--warm-dark)"}`,
+              background: active ? "#5c8c60" : "white",
+              border: active
+                ? "1.5px solid transparent"
+                : "1.5px solid #b0ccb2",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: active
-                ? "0 0 0 4px rgba(92,140,96,0.15)"
-                : "var(--shadow-soft)",
-              transition: "all 0.3s ease",
-              animation: active
-                ? "pulse-reach 2.5s ease-in-out infinite"
-                : "none",
+              transition: "all 0.35s ease",
               position: "relative",
               zIndex: 1,
             }}
           >
             <div
               style={{
-                width: 14,
-                height: 14,
+                width: 13,
+                height: 13,
                 borderRadius: "50%",
-                border: `2px solid ${active ? "rgba(255,255,255,0.85)" : "var(--sage)"}`,
-                transition: "border-color 0.3s ease",
+                border: `2px solid ${active ? "rgba(255,255,255,0.85)" : "#7aac7e"}`,
+                transition: "border-color 0.35s ease",
+                animation: active
+                  ? "pulse-dot 2.5s ease-in-out infinite"
+                  : "none",
               }}
             />
           </div>
         </div>
+
         <div>
           <p
             style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: active ? "var(--sage)" : "var(--ink)",
-              marginBottom: 1,
+              fontSize: 13.5,
+              fontWeight: 500,
+              color: active ? "#3e6e42" : "#2d4a2f",
+              margin: 0,
+              transition: "color 0.3s",
             }}
           >
             {active ? "Circle notified" : "Reach"}
           </p>
-          <p
-            style={{ fontSize: 11, color: "var(--ink-soft)", lineHeight: 1.4 }}
-          >
+          <p style={{ fontSize: 11.5, color: "#7a9c7d", marginTop: 2 }}>
             {active
               ? "You don't have to say anything."
               : "signal quietly for support"}
@@ -121,25 +153,25 @@ function ReachButton({ setReachCount }) {
       {noticeVisible && (
         <div
           style={{
-            marginTop: 10,
-            paddingTop: 10,
-            borderTop: "1px solid var(--warm-mid)",
-            fontSize: 11,
-            color: "var(--sage)",
+            marginTop: 11,
+            paddingTop: 11,
+            borderTop: "1px solid rgba(92,140,96,0.2)",
             display: "flex",
             alignItems: "center",
-            gap: 6,
-            animation: "fadeIn 0.4s ease",
+            gap: 8,
+            fontSize: 11.5,
+            color: "#4a7a4e",
+            animation: "fadeUp 0.4s ease",
           }}
         >
           <div
             style={{
-              width: 6,
-              height: 6,
+              width: 7,
+              height: 7,
               borderRadius: "50%",
-              background: "var(--sage)",
+              background: "#7aac7e",
               flexShrink: 0,
-              animation: "breathe 1.5s ease-in-out infinite",
+              animation: "pulse-dot 1.8s ease-in-out infinite",
             }}
           />
           {notice}
@@ -232,6 +264,23 @@ export default function Sidebar({
         <p style={{ fontSize: 11, color: "var(--ink-soft)", paddingLeft: 37 }}>
           anonymous • safe • real
         </p>
+      </div>
+
+      {/* Reach Button — right under the logo */}
+      <div style={{ paddingBottom: 8 }}>
+        {reachCount > 0 && (
+          <p
+            style={{
+              fontSize: 11,
+              color: "var(--ink-soft)",
+              textAlign: "center",
+              marginBottom: 6,
+            }}
+          >
+            {reachCount} in the circle right now
+          </p>
+        )}
+        <ReachButton reachCount={reachCount} setReachCount={setReachCount} />
       </div>
 
       {/* Nav */}
@@ -410,23 +459,6 @@ export default function Sidebar({
           )}
         </div>
       )}
-
-      {/* Reach Button */}
-      <div style={{ paddingBottom: 20 }}>
-        {reachCount > 0 && (
-          <p
-            style={{
-              fontSize: 11,
-              color: "var(--ink-soft)",
-              textAlign: "center",
-              marginBottom: 6,
-            }}
-          >
-            {reachCount} in the circle right now
-          </p>
-        )}
-        <ReachButton reachCount={reachCount} setReachCount={setReachCount} />
-      </div>
     </aside>
   );
 }
