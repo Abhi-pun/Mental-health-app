@@ -42,12 +42,14 @@ function ReachButton({ setReachCount }) {
       style={{
         margin: "8px 12px 0",
         borderRadius: 18,
-        border: active ? "1.5px solid #5c8c60" : "1.5px solid #c8dbc9",
-        background: active ? "#e8f3e8" : "#f2f8f2",
+        border: active ? "1.5px solid #2e9e45" : "1.5px solid #4dbd66",
+        background: active ? "#c8edcf" : "#dff5e4",
         padding: "16px 18px",
         cursor: "pointer",
         transition: "all 0.35s ease",
-        boxShadow: active ? "0 0 0 5px rgba(92,140,96,0.11)" : "none",
+        boxShadow: active
+          ? "0 0 0 5px rgba(46,158,69,0.15)"
+          : "0 0 0 3px rgba(77,189,102,0.12)",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -69,7 +71,7 @@ function ReachButton({ setReachCount }) {
               position: "absolute",
               inset: 0,
               borderRadius: "50%",
-              border: "1.5px solid rgba(92,140,96,0.4)",
+              border: "1.5px solid rgba(46,158,69,0.5)",
               animation: active ? "breathe 2.8s ease-in-out infinite" : "none",
             }}
           />
@@ -79,7 +81,7 @@ function ReachButton({ setReachCount }) {
               position: "absolute",
               inset: 0,
               borderRadius: "50%",
-              border: "1.5px solid rgba(92,140,96,0.2)",
+              border: "1.5px solid rgba(46,158,69,0.25)",
               animation: active
                 ? "breathe2 2.8s ease-in-out infinite 0.5s"
                 : "none",
@@ -92,7 +94,7 @@ function ReachButton({ setReachCount }) {
                 position: "absolute",
                 inset: 0,
                 borderRadius: "50%",
-                background: "rgba(92,140,96,0.22)",
+                background: "rgba(46,158,69,0.28)",
                 animation: "ripple 0.65s ease-out forwards",
               }}
             />
@@ -103,10 +105,8 @@ function ReachButton({ setReachCount }) {
               width: 42,
               height: 42,
               borderRadius: "50%",
-              background: active ? "#5c8c60" : "white",
-              border: active
-                ? "1.5px solid transparent"
-                : "1.5px solid #b0ccb2",
+              background: active ? "#2e9e45" : "#4dbd66",
+              border: "1.5px solid transparent",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -120,7 +120,7 @@ function ReachButton({ setReachCount }) {
                 width: 13,
                 height: 13,
                 borderRadius: "50%",
-                border: `2px solid ${active ? "rgba(255,255,255,0.85)" : "#7aac7e"}`,
+                border: `2px solid rgba(255,255,255,0.85)`,
                 transition: "border-color 0.35s ease",
                 animation: active
                   ? "pulse-dot 2.5s ease-in-out infinite"
@@ -134,18 +134,18 @@ function ReachButton({ setReachCount }) {
           <p
             style={{
               fontSize: 13.5,
-              fontWeight: 500,
-              color: active ? "#3e6e42" : "#2d4a2f",
+              fontWeight: 600,
+              color: active ? "#1e7a33" : "#1e6b30",
               margin: 0,
               transition: "color 0.3s",
             }}
           >
-            {active ? "Circle notified" : "Reach"}
+            {active ? "Circle notified" : "REACH"}
           </p>
-          <p style={{ fontSize: 11.5, color: "#7a9c7d", marginTop: 2 }}>
+          <p style={{ fontSize: 11.5, color: "#3a8a4e", marginTop: 2 }}>
             {active
               ? "You don't have to say anything."
-              : "signal quietly for support"}
+              : "Signal quietly for support"}
           </p>
         </div>
       </div>
@@ -155,12 +155,12 @@ function ReachButton({ setReachCount }) {
           style={{
             marginTop: 11,
             paddingTop: 11,
-            borderTop: "1px solid rgba(92,140,96,0.2)",
+            borderTop: "1px solid rgba(46,158,69,0.25)",
             display: "flex",
             alignItems: "center",
             gap: 8,
             fontSize: 11.5,
-            color: "#4a7a4e",
+            color: "#1e7a33",
             animation: "fadeUp 0.4s ease",
           }}
         >
@@ -169,7 +169,7 @@ function ReachButton({ setReachCount }) {
               width: 7,
               height: 7,
               borderRadius: "50%",
-              background: "#7aac7e",
+              background: "#4dbd66",
               flexShrink: 0,
               animation: "pulse-dot 1.8s ease-in-out infinite",
             }}
