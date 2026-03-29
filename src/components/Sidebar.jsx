@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Leaf } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 function ReachButton({ setReachCount }) {
@@ -242,14 +243,7 @@ export default function Sidebar({
               justifyContent: "center",
             }}
           >
-            <div
-              style={{
-                width: 12,
-                height: 12,
-                borderRadius: "50%",
-                border: "2.5px solid white",
-              }}
-            />
+            <Leaf size={14} color="white" strokeWidth={2} />
           </div>
           <span
             style={{
