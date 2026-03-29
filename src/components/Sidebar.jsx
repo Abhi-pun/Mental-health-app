@@ -252,7 +252,7 @@ export default function Sidebar({
               color: "var(--ink)",
             }}
           >
-            SafeCircle
+            SafeSpace
           </span>
         </div>
         <p style={{ fontSize: 11, color: "var(--ink-soft)", paddingLeft: 37 }}>
